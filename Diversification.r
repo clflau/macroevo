@@ -18,34 +18,51 @@ tt <- simulateTree(pars, max.taxa=100)
 
 plot(tt,  show.tip.label = F)
 
-# use function diversitree::make.bd
+# use function diversitree::make.bd  
 # fit model with fitDiversitree
 # Example:
 #   my_likelihood_fxn <- make.bd(....)
 
-tt.func <- make.bd(tt)
-fitDiversitree(tt.func)
+tt.func <- make.bd(tt) #this creates a likelihood function based on the tree tt
+fitDiversitree(tt.func) 
 tt.func
 
 
-##Simulate 1000 trees
-# General template for simulations:
-# In this example, we will just
-#  generate a single random number 
-#  for each replicate simulation, then
-#  store the results in a vector.
+##Simulate 100 trees
+
+REPS <- 100
+lambdaVal <- numeric(REPS)
+muVal <- numeric(REPS)
+for (i in 1:REPS){
+
+  #  Here we would do the simulation: 
+  pars <- c(10, 5); #in order: lambda, mu
+  tt <- simulateTree(pars, max.taxa=100)
+  tt.func <- make.bd(tt)
+  tmp <- fitDiversitree(tt.func)
+  
+  lambdaVal[i] <- tmp $pars["lambda"]
+  muVal[i] <- tmp $pars["mu"]
+}
+par(mfrow = c(2,1))
+hist(lambdaVal)
+hist(muVal)
+
+
+
 
 REPS <- 5
-myResults <- numeric(REPS)
+taxon_count <- numeric(REPS)
 for (i in 1:REPS){
-  
-  #  Here we would do the simulation: 
-  tmp <- rnorm(1)
-  
-  #   tmp is now the result of our simulation.
-  #   We will now store it in the results vector: 
-  
-  myResults[i] <- tmp
+  pars <- c(10, 5)
+  tree <- simulateTree(pars, max.taxa = 100)
+  taxon_count[i] <- length(tree$tip.label)
   
 }
 
+#    taxon_count is now a vector 
+#     of richness: you can plot a histogram
+#     with function hist(...)
+#     compute mean, quantile, etc.
+
+hist(taxon_count)
