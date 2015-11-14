@@ -47,3 +47,5 @@ specbearDeltaMass<-rnorm(1, mean=0, sd=sqrt(sigmasq*tree$edge.length[1])) # in R
 specbearMass <- rootMass + specbearDeltaMass
 specbearMass
 
+specbearDeltaMass
+
