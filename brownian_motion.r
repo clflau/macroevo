@@ -242,6 +242,7 @@ delta.aicc <- all.aicc - min(all.aicc) # This may seem a bit circumstantial for 
 delta.aicc # delta AIC or AICC scores >2 are ususally considered to provide positive support
 #akaike weights: AIC and AICc scores can also be expressed as Akaike weights, representing relative likelihood of the model (=exp( -0.5 * deltaAIC score for that model). Akaike weight for a given model are the rel. likelihood of the model divided by sum of all relative likelihoods across all models:
 rel.L <- exp(-delta.aicc*0.5)
+rel.L #relative likelihood
 AK.weights <- rel.L/sum(rel.L)
 AK.weights
 
