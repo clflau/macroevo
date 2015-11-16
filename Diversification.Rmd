@@ -1,32 +1,16 @@
-## Diversification exercise
+---
+title: "Diversification - Clive"
+output: html_document
+---
+
+##Exercise 1: Can we estimate speciation and extinction with confidence?
+I simulated 100 trees with parameters lambda = mu = 10. The mean speciation rate from the 100 trees I simulated was 10.94058 with a stdev of 2.225721. The mean extinction rate from the 100 trees I simulated was 6.15224 with a stdev of 2.750573.
+```{r}
 rm(list = ls())
 library(geiger)
 library(phytools)
 library(diversitree)
 source('rabosky_functions.R')
-
-# Using function simulateTree to simulate a birth death tree:
-# Example, lambda = 10, mu = 5
-pars <- c(10, 0); #in order: lambda, mu
-tt <- simulateTree(pars, max.taxa=100)
-
-##simulate under BD and fit gamma
-## is confidence in speciation or extinction better?
-## regression
-## show loop construct
-## pull lambda and mu
-
-plot(tt,  show.tip.label = F)
-
-# use function diversitree::make.bd  
-# fit model with fitDiversitree
-# Example:
-#   my_likelihood_fxn <- make.bd(....)
-
-tt.func <- make.bd(tt) #this creates a likelihood function based on the tree tt
-fitDiversitree(tt.func) 
-tt.func
-
 
 ##Simulate 100 trees
 
@@ -47,9 +31,12 @@ for (i in 1:REPS){
 par(mfrow = c(2,1))
 hist(lambdaVal)
 hist(muVal)
+```
 
+##Exercise 2: How much variation is there in a birth-death process?
+I ran the simulation for 100 trees with max.t = 1. There is significant variation in the number of species from each tree. 
 
-#################################################################################
+```{r}
 #Variation in bd process
 REPS <- 100
 taxon_count <- numeric(REPS)
@@ -66,9 +53,11 @@ for (i in 1:REPS){
 #     compute mean, quantile, etc.
 par(mfrow = c(1, 1)) 
 hist(taxon_count, main = "Stochasticity in birth-death process in taxon count")
+```
 
-####################################################################
-
+##Exercise 3:
+Trees made with no extinction in general have more evenly distributed waiting times than trees made with extinction.
+```{r}
 #Lineage Through Time
 ## 
 pars <- c(10, 5); #in order: lambda, mu
@@ -80,9 +69,10 @@ plot(livingOnly, show.tip.label = F)
 par(mfrow = c(1,2))
 plot(ttEx, show.tip.label = F, main = "extant and extinct")
 plot(livingOnly, show.tip.label = F, main = "extant only")
+```
 
+```{r}
 #What does extinction do to the shape of the tree? Simulate 5 trees with and without extinction
-
 
 treeExlist <- list()  #make empty list for trees to fill in
 treeNoExlist <- list()
@@ -96,8 +86,7 @@ for (i in 1:5) {
   treeNoExlist[[i]] <- treeNoEx
 }
 
-#par(mfrow = c(5,2), mar=c(0.8, 0.8, 0.8, 0.8)) #beware of margins, (margins too big error)
-layout(matrix(1:10, 5, 2))
+par(mfrow = c(5,2), mar=c(0.8, 0.8, 0.8, 0.8)) #beware of margins, (margins too big error)
 for (i in 1:5) {
   plot(treeExlist[[i]], show.tip.label = F, main = "extinction")
   plot(treeNoExlist[[i]], show.tip.label = F, main = "no extinction")
@@ -107,8 +96,12 @@ for (i in 1:5) {
   ltt(treeExlist[[i]])
   ltt(treeNoExlist[[i]])
 }
+```
 
+##Exercise 4: 
+The ltt plot of the density dependent tree does not form a linear plot like the pure-birth tree. 
 
+```{r}
 #Diversity-Dependence Model
 library(DDD)   #package for diversity dependent diversification
 ddTree <- dd_sim(c(0.12,0.02,100),100) # pars: c(lambda, mu, K)
@@ -117,40 +110,11 @@ ddLivingOnly <- ddTree[[1]]
 par(mfrow = c(1,2))
 plot(ddLivingOnly, show.tip.label = F, main = "diversity dependence")
 ltt(ddLivingOnly)
+```
 
+##Exercise 5
 
-##Diversification Analysis
-require(geiger) # loads geiger
-require(laser) # loads laser
-par(mfrow = c(1, 1))
-snake_tree<-read.tree("homalops.phy") 
-# plot the tree
-plot(snake_tree)
-pdf('snaketree.pdf')
-plot(ladderize(snake_tree)) 
-dev.off()
-ltt.plot(snake_tree, log="y")
-
-layout(matrix(1:2, 2, 1))
-data(bird.families)
-data(bird.orders)
-#plot them with titles
-ltt.plot(bird.families)
-title("Lineages Through Time Plot of the Bird Families")
-ltt.plot(bird.families, log = "y")
-title(main = "Lineages Through Time Plot of the Bird Families",
-      sub = "(with logarithmic transformation of the y-axis)")
-
-layout(matrix(1:4, 2, 2))
-plot(bird.families, show.tip.label = FALSE)
-ltt.plot(bird.families, main = "Bird families")
-plot(snake_tree, show.tip.label = FALSE)
-ltt.plot(snake_tree, main = "Homalopsid species")
-
-layout(matrix(1))
-mltt.plot(bird.families, bird.orders)
-
-#using laser to plot ltt
+```{r}
 library(laser)
 snake.times<-getBtimes('homalops.phy')
 snake_tree<-read.tree("homalops.phy") 
@@ -162,7 +126,6 @@ layout(matrix(1:2, 2,1))
 ltt.plot(snake_tree, log="y", main = "APE LTT")
 plotLtt(snake.times) 
 
-#############################################################
 ##gamma stat
 snake_gamma <- gammaStat(snake_tree)
 snake_gamma 
@@ -203,10 +166,12 @@ count
 # finally, what is the p-value?
 mccr_pval <- (count+1)/(num_simulations+1)
 mccr_pval
+```
 
-#############################################################
+```{r}
 ##Fitting diversification models to branching times
 #laser works with branching times instead of tree
+library(laser)
 snake.times <- getBtimes('homalops.phy')
 
 pb <- pureBirth(snake.times) #pb
@@ -232,8 +197,13 @@ foo <- function(x) x-x[which(x==min(x))] #quick function to compare all models t
 daic <- t(apply(aic.all, 1, foo))#apply that function to everything in aic.all
 cat("Table of delta-aic values; zero - best model\n")
 print(daic, digits=2)
+```
 
-###################################################################
+###What would you conclude from this table? How is this different from what you can say after the MCCR test?
+The table indicates that the logistic diversity dependent model is the best fit. This is also consistent with the MCCR test.
+
+##Exercise 6
+```{r}
 
 balistoid.tree <- read.tree("balistoids.phy")
 balistoid.times <- getBtimes("balistoids.phy")
@@ -264,7 +234,9 @@ count
 # finally, what is the p-value?
 mccr_pval <- (count+1)/(num_simulations+1)
 mccr_pval
+```
 
+```{r}
 pb <- pureBirth(balistoid.times) #pb
 aic.pb <- pb$aic#store aic score
 bd <- bd(balistoid.times) # birth-death
@@ -288,40 +260,9 @@ foo <- function(x) x-x[which(x==min(x))] #quick function to compare all models t
 daic <- t(apply(aic.all, 1, foo))#apply that function to everything in aic.all
 cat("Table of delta-aic values; zero - best model\n")
 print(daic, digits=2)
+```
+The pure-birth model fits best for the balistoid tree. This is consistent with a gamma near 0.
 
 
-######################################################################
-#Additional simulations on gamma statistic and the Colless tree imbalance statistic
-library(ape)
-library(phytools)
-numtrees <- 1000
-trees <- pbtree(n = 50, nsim = numtrees, ape = F)
 
-foo <- function(tree, metric = "colless") {
-  if (metric == "colless") {
-    #xx <- as.treeshape(x)  # convert to apTreeshape format
-    colless(tree)
-    #colless(xx, norm = "yule")  # calculate colless' metric
-  } else if (metric == "gamma") {
-    gammaStat(tree)
-  } else stop("metric should be one of colless or gamma")
-}
 
-theme_myblank <- function() {
-  stopifnot(require(ggplot2))
-  theme_blank <- ggplot2::theme_blank
-  ggplot2::theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), 
-                 panel.background = element_blank(), plot.background = element_blank(), 
-                 axis.title.x = element_text(colour = NA), axis.title.y = element_blank(), 
-                 axis.text.x = element_blank(), axis.text.y = element_blank(), axis.line = element_blank(), 
-                 axis.ticks = element_blank())
-}
-library(plyr)
-library(apTreeshape)
-colless_df <- ldply(trees, foo, metric = "colless")  # calculate metric for each tree
-
-#calculate cutoffs 
-col_percent_low <- round(length(colless_df[colless_df$V1 < -0.7, "V1"])/numtrees, 2) * 100
-col_percent_high <- round(length(colless_df[colless_df$V1 > 0.7, "V1"])/numtrees, 2) * 100
-
-library(ggplot2)

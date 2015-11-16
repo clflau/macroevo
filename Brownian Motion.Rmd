@@ -1,5 +1,12 @@
+---
+title: "Brownian Motion - Clive"
+output: html_document
+---
+
 #simulate brownian motion 
-##Exercise 1
+##Exercise 1: What value do you expect this trait to have after 100 time units? 1000 time units? Why?
+In my simulation, after 100 time units, the trait value is -27; after 1000 time units, the trait value is -5. Because BM is a random walk, it is not possible to predict the precise value of a single lineage, but across multiple lineages, the trait values at time t will center around the initial value as the mean.
+```{r}
 par(mfrow = c(1,1))
 displace <- rnorm(1000)  #series of draws from normal distribution
 plot(displace)
@@ -12,40 +19,36 @@ plot(cumsum(rnorm(1000)), type="l", ylim=c(-100,100))
 for(i in 1:length(cols)) 
   lines(cumsum(rnorm(1000)), col=cols[i]) # simple for loop for each of the 50 colour samples we draw a line on the plot that is the cumulative summation of 100 draws from a normal distribution. 
 
-##Exercise 2
-layout(matrix(1:2, 1, 2))
+```
+
+##Exercise 2: Write an R block that plots Brownian evolution for 50 independent lineages for 50 time units side by side with BM for 100 time units. What is the effect of time on the diversity in trait values you see in those simulations? How does time affect diversity under BM?
+Diversity in trait values increase with time under BM. 
+```{r}
+par(mfrow = c(1,2))
 plot(cumsum(rnorm(50)), type="l", ylim=c(-50,50), main="Effect of time under BM")
 for(i in 1:50)
   lines(cumsum(rnorm(50)), col="blue")
 plot(cumsum(rnorm(100)), type="l", ylim=c(-50,50))
 for(i in 1:50)
   lines(cumsum(rnorm(100)), col="red")
+```
 
-##Exercise 3
+##Exercise 3: What is the rate parameter of Brownian motion? How does trait variance in a clade evolving under BM scale with rate?
+The rate parameter is the variance of the normal distribution from which the simulation draws for each step. The trait variance in a clade increases with rate under BM. 
+```{r}
 par(mfcol = c(1,1))
 plot(cumsum(rnorm(100)), type="l", ylim=c(-80,80), ylab="Trait", col="blue")
 for(i in 1:20) lines(cumsum(rnorm(100)), col="blue")
 for(i in 1:20) lines(cumsum(rnorm(100, sd=5)), col="green")  # sigma=5, sigma^2=25
+```
 
-##Exercise 4
+##Exercise 4: Write a block of R code that simulate BM evolution for this three taxon tree. You can do this as a series of steps or write a general function.
+
+```{r}
 tree<-read.tree(text="((grizzlybear:1, polarbear:1):4, spectacledbear:5);")
 plot(tree)
 nodelabels() #adds node labels
 axisPhylo() #adds branchlength axis
-
-rootMass <- 250 # size of ancestor
-sigmasq = 2.5 # Brownian rate
-time = 5 # 5 million years of independent evolution from the root
-sd <- sqrt(time * sigmasq) # Brownian evolution is proportional to rate X time)
-specbearDeltaMass <- rnorm(1, mean = 0, sd = sd)
-specbearMass <- rootMass + specbearDeltaMass
-specbearMass
-
-#another way to do this using the tree structure itself to supply the time argument
-specbearDeltaMass<-rnorm(1, mean=0, sd=sqrt(sigmasq*tree$edge.length[1])) # in R, tree tip labels are numbered from top to bottomw, so in our tree spectacled bear = 1, polarbear = 2, and grizzly = 3
-specbearMass <- rootMass + specbearDeltaMass
-specbearMass
-tree$edge.length[1]
 
 rootMass <- 250 # size of ancestor
 sigmasq = 2.5 # Brownian rate
@@ -54,8 +57,8 @@ time = 5 # 5 million years of independent evolution from the root
 sd <- sqrt(time * sigmasq) # Brownian evolution is proportional to rate X time)
 specbearDeltaMass <- rnorm(1, mean = 0, sd = sd)
 specbearMass <- rootMass + specbearDeltaMass
-cat("spectacled bear mass\n")
-specbearMass
+cat("spectacled bear mass\n", specbearMass)
+
 #polarbear + grizzlybear
 time = 4
 sd <- sqrt(time * sigmasq)
@@ -64,17 +67,18 @@ polgrizbearMass <- rootMass + rnorm(1, mean = 0, sd = sd)
 time = 1
 sd <- sqrt(time * sigmasq)
 polbearMass <- polgrizbearMass + rnorm(1, mean = 0, sd = sd)
-cat("polar bear mass\n")
-polbearMass
+cat("polar bear mass\n", polbearMass)
+
 #grizzlybear
 time = 1
 sd <- sqrt(time * sigmasq)
 grizbearMass <- polgrizbearMass + rnorm(1, mean = 0, sd = sd)
-cat("grizzly bear mass\n")
-grizbearMass
+cat("grizzly bear mass\n", grizbearMass)
+```
 
-#################################################################
-#Trends
+##Exercise 5: Simulate 15 runs of a trend process for two groups of species: one with a mu of 0.5 and and the other with a mu of -0.5 for 100 MY. If you were to measure trait diversity in these groups at 100 only (in other words, if you did not knowm the true trait history) is there any information in those trait values that could distinguish evolution under a trend from regular Brownian evolution? Can you think of any additional information that would be helpful in distinguishing these models?
+I simulated the runs assuming sd of 1, without knowing the brownian rate sigmasq, it is impossible to know whether these groups were evolving with a trend or under regular brownian motion with a large brownian rate.
+```{r}
 bmtrend <- function(time, mu, stdev){ # a function that requires mu which is the trend parameter showing how the mean of the normal distribution changes over time, time the length of the simulation and stdev the standard deviation of the normal distribution, it assumes the starting ancestral trait value is 0
   displace < -vector(, length=time) # set up an empty vector of the same length as time
   for(i in 1:time){
@@ -83,19 +87,6 @@ bmtrend <- function(time, mu, stdev){ # a function that requires mu which is the
   traj <- cumsum(displace) # calculates the trajectory over time        
   return(traj) 
 }
-#Now we are going to run this bmtrend function 10 times using the replicate function, once with a mu of 0.02 and the other with mu=-0.02
-par(mfrow = c(1,1))
-bmtrend0.02 <- replicate(10, bmtrend(100, 0.02, 1))
-bmtrendneg0.02 <- replicate(10, bmtrend(100, -0.02, 1))
-
-cols1 <- rainbow(10) # sample 10 colours from the rainbow palette
-cols2 <- grey(0:10/10) # sample 10 colours from the grey/gray level specification - it has a different syntax from the other palettes like rainbow, topo, terrain, heat.colors etc.
-
-plot(bmtrend0.02[, 1], xlim=c(0,100), ylim=c(-150, 150), type="l", col=cols1[1], xlab="Time", ylab="Trait")
-for(i in 2:10) 
-  lines(bmtrend0.02[, i], col=cols1[i])
-for(i in 1:10) 
-  lines(bmtrendneg0.02[, i], col=cols2[i])
 # simulate 15 runs with mu of 0.5 and -0.5 for 100my
 par(mfrow = c(1,1))
 bmtrend0.5 <- replicate(15, bmtrend(100, 0.5, 1))
@@ -109,8 +100,11 @@ for(i in 2:10)
   lines(bmtrend0.5[, i], col=cols1[i])
 for(i in 1:10) 
   lines(bmtrendneg0.5[, i], col=cols2[i])
+```
 
-################################################################
+##Exercise 6: Describe the evolutionary trajectory of the trait under OU. Make a second plot of BM with the same starting value, sigma, and time and show it side by side with your OU simulation. Compare the evolutionary trajectories and ending diversities of BM and OU. In what ways is OU different from BM?
+The OU plot rapidly pulls the trait value to the optimal and brownian motion takes over centering around the optimal value. Under pure BM the ending diversities in trait values is much greater and there is no preference for the optimal.
+```{r}
 #OU model
 
 alpha<-0.4 #optimal value
@@ -157,48 +151,11 @@ BMsigma0.5 <-cumsum(rnorm(100, mean = 0, sd = sigma))
 plot(BMsigma0.5, ylim = c(-2, 2), type = "l", main = "BM alpha=0.4 sigma=0.05")
 for(i in 1:length(cols))
   lines(cumsum(rnorm(100, mean = 0, sd = sigma)), col=cols[i])
-  
-###Several examples of OU
-alpha1sigma0.01theta1<-replicate(10, ornstein_uhlenbecksim(100, 1, 1, 0.01, 0)) # replicate just runs it 10 times for us to illustrate the variance between runs
+```
 
-colr<-topo.colors(9)
+##Exercise 7: Your assignment is to 1) choose buccal width or eye width as your trait 2) compare the fit of BM, OU, trend, and EB models using likelihood and AIC. The likelihood ratio test won't be very useful here as you don't have a nested hierachy of models. Report the likelihoods, AICcs, and delta AICs in a table (see Lab 1 for an example of how to extract and display these in an orderly way). What model or models fit your data best? Can you explain what the pattern of variation in your data set must be to support those fits? In other words, do you have any intuition for how clade trait diversity should scale with clade diversity for BM versus OU? How do these expectations differ for the trend model? We did not discuss the early burst model yet but you can read a brief description of the model using the help function. How should trait diveristy change through time under EB?
 
-plot(alpha1sigma0.01theta1[,1], type="l", main="alpha1 sigma=0.01", ylim=c(-2, 2))
-for(i in 2:ncol(alpha1sigma0.01theta1)) lines(alpha1sigma0.01theta1[,i], type="l",col=colr[i-1] )
-
-# play with different parameters.
-
-alpha0.5sigma0.01theta1<-replicate(10, ornstein_uhlenbecksim(100, 1, 0.5, 0.01, 0))
-alpha0.1sigma0.01theta1<-replicate(10, ornstein_uhlenbecksim(100, 1, 0.1, 0.01, 0))
-alpha0sigma0.01theta1<-replicate(10, ornstein_uhlenbecksim(100, 1, 0, 0.01, 0))
-alpha1sigma0.1theta1<-replicate(10, ornstein_uhlenbecksim(100, 1, 1, 0.1, 0))
-alpha0.5sigma0.1theta1<-replicate(10, ornstein_uhlenbecksim(100, 1, 0.5, 0.1, 0))
-alpha0.1sigma0.1theta1<-replicate(10, ornstein_uhlenbecksim(100, 1, 0.1, 0.1, 0))
-alpha0sigma0.1theta1<-replicate(10, ornstein_uhlenbecksim(100, 1, 0, 0.1, 0))
-
-par(mfrow=c(2,2))
-
-plot(alpha1sigma0.01theta1[,1], type="l", main="alpha1 sigma=0.01", ylim=c(-2, 2))
-for(i in 2:ncol(alpha1sigma0.01theta1)) lines(alpha1sigma0.01theta1[,i], type="l",col=colr[i-1] )
-plot(alpha1sigma0.1theta1[,1], type="l", main="alpha1 sigma=0.1", ylim=c(-2, 2))
-for(i in 2:ncol(alpha1sigma0.1theta1)) lines(alpha1sigma0.1theta1[,i], type="l",col=colr[i-1] )
-plot(alpha0.5sigma0.01theta1[,1], type="l", main="alpha0.5 sigma=0.01", ylim=c(-2, 2))
-for(i in 2:ncol(alpha0.5sigma0.01theta1)) lines(alpha0.5sigma0.01theta1[,i], type="l",col=colr[i-1] )
-plot(alpha0.5sigma0.1theta1[,1], type="l", main="alpha0.5 sigma=0.1", ylim=c(-2, 2))
-for(i in 2:ncol(alpha0.5sigma0.1theta1)) lines(alpha0.5sigma0.1theta1[,i], type="l", col=colr[i-1] )
-
-plot(alpha0.1sigma0.01theta1[,1], type="l", main="alpha0.1 sigma=0.01", ylim=c(-2, 2))
-for(i in 2:ncol(alpha0.1sigma0.01theta1)) lines(alpha0.1sigma0.01theta1[,i], type="l", col=colr[i-1] )
-plot(alpha0.1sigma0.1theta1[,1], type="l", main="alpha0.1 sigma=0.1", ylim=c(-2, 2))
-for(i in 2:ncol(alpha0.1sigma0.1theta1)) lines(alpha0.1sigma0.1theta1[,i], type="l", col=colr[i-1] )
-plot(alpha0sigma0.01theta1[,1], type="l", main="alpha0 sigma=0.01", ylim=c(-2, 2))
-for(i in 2:ncol(alpha0sigma0.01theta1)) lines(alpha0sigma0.01theta1[,i], type="l", col=colr[i-1] )
-plot(alpha0sigma0.1theta1[,1], type="l", main="alpha0 sigma=0.1", ylim=c(-2, 2))
-for(i in 2:ncol(alpha0sigma0.1theta1)) lines(alpha0sigma0.1theta1[,i], type="l", col=colr[i-1] )
-
-######################################################################
-#Model fitting
-
+```{r}
 library(ape)
 library(geiger)
 library(parallel)
@@ -209,24 +166,10 @@ head(dat)
 trait <- dat[,2] # Selecting a trait 
 names(trait) <- tre$tip.label # Assigning the appropriate tip labels to the trait object
 names(trait) <- dat$taxon
-
 #fitting BM model with geiger function fitContinuous
 BM.model <- fitContinuous(tre, trait, model="BM")
-BM.model
-BM.model$bnd
-BM.model$opt # The ouput includes info on sigma squared and the root state (z0)
-BM.model$opt$lnL
-BM.model$opt$aicc
 #fitting OU model
 OU.model <- fitContinuous(tre, trait, model="OU") #could run into problems with bounds too narrow
-OU.model$bnd
-OU.model <- fitContinuous(tre, trait, model="OU", bounds=list(alpha=c(0, 150))) #change bounds
-
-# How does the likelihood compare to the BM model?
-BM.model$opt$lnL
-OU.model$opt$lnL
-
-# It looks like the OU model has the higher likelihood...
 
 # One way to assess the difference between these two models more formally is the likelihood ratio test.
 # BM is a special case of OU (for alpha=0), so the models are nested and the LR test is fine.
@@ -244,7 +187,9 @@ delta.aicc # delta AIC or AICC scores >2 are ususally considered to provide posi
 rel.L <- exp(-delta.aicc*0.5)
 AK.weights <- rel.L/sum(rel.L)
 AK.weights
-
+```
+I chose the eye width character as my trait. The OU model shows the highest likelihood and lowest AICc. The OU model fits the data best, followed by the trend model. This suggests that there is a directionality in the trait evolution, which manifests as either the optimal value in the OU model or the shift in the mean over time in the trend model. The trait diversity should scale less for OU than for BM, due to the pull by the optimum. I would expect the trend model to show more trait diversity than OU. Under EB, trait diversity should reach maximum early and remain more or less constant after.
+```{r}
 #eye width
 trait <- dat[,3]
 names(trait) <- dat$taxon
@@ -265,4 +210,6 @@ AK.weights <- rel.L/sum(rel.L)
 df <- data.frame(model, likelihood, AICc, delta.aicc, AK.weights) 
 cat("Summary Table")
 print(df)
+```
+
 
