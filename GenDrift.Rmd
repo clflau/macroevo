@@ -161,7 +161,7 @@ table <- rbind(popsize, fixedproportion)
 table
 ```
 
-d) How is this probability affected by the pop size?\
+d) How is this probability affected by the pop size?
 
 It isn't affect by the population size.
 
@@ -171,4 +171,185 @@ They are all close to 10%, matching the theoretical prediction.
 
 #Coalescent simulations
 
+##Exercise 5: what is the rate of coalescence for a sample size of 2 chromosomes in a population of size 2N chromosomes? 
+
+The probability of coalescence in 1 generation will be 1/(2N) for pop size of 2N chromosomes.
+
+##Exercise 6: Perform 10,000 simulations of coalescent times for a sample size of 2 chromosomes from this pop size of 2N=20,000.
+
+a) What is the average TMRCA?
+```{r}
+#10,000 sims; 2N=20,000
+NN <- 10000
+CoalesTime <- rexp(10000, 1/(2*NN))
+mean(CoalesTime)
+```
+
+b) What is the theoretical expectation?
+
+Expected Coalescent time=2N=20,000.
+
+c) How do the two values compare?
+
+They are very close.
+
+d) Make density plot of simulated coalescent times.
+```{r}
+#density plot
+hist(CoalesTime)
+```
+
+e) What is the standard devation of the coalescent times?
+```{r}
+sd(CoalesTime)
+```
+
+##Exercise 7: Repeat simulation; set 2N=2,000.
+
+a) What is the average TMRCA?
+```{r}
+#10,000 sims, 2N=2,000
+NN <- 1000
+CoalesTime <- rexp(10000, 1/(2*NN))
+mean(CoalesTime)
+```
+
+b) What is the theoretical expectation?
+
+Expected Coalescent time=2N=2,000.
+
+c) How do the two values compare?
+
+They are very close.
+
+d) Make density plot of simulated coalescent times.
+```{r}
+#density plot
+hist(CoalesTime)
+```
+
+e) What is the standard devation of the coalescent times?
+```{r}
+sd(CoalesTime)
+```
+
+f) How does the average TMRCA from the simulations in question 6 compare to the average TMRCA from the simulations in question 7?
+
+The average TMRCA for 2N=20,000 is 10 times that of the average TMRCA for 2M=2,000. 
+
+g) What can you conclude about how the population size affects the expected coalescent time?
+
+The expected coalescent time increases linearly with respect to the population size. 
+
+##EXercise 8: Add mutations to the genealogies simulated. Set mu=1e^-4
+
+a) Add mutations to the genealogies in question 6 (2N=20,000)
+```{r}
+#add mutations, 10,000 sims, 2N=20,000
+mu <- 1e-4
+NN <- 10000
+CoalesTime <- rexp(10000, 1/(2*NN))
+MutaRate <- 2*mu*CoalesTime
+mean(MutaRate)
+NumbSNP <- rpois(10000, mean(MutaRate))
+```
+
+b) What is the average number of SNPs per genealogy?
+```{r}
+mean(NumbSNP)
+```
+
+c) What is theta predicted to be in this example?
+```{r}
+#theta=4*N*mu
+theta <- 4*NN*mu
+theta
+```
+
+d) How does theta compare to the average number of SNPs in simulations?
+
+They are similar.
+
+e) Pretty neat, huh?
+```{r}
+print("Yes, pretty neat!")
+```
+
+f) Make density plot on the number of SNPs per simulation replicate
+```{r}
+#density plot
+hist(NumbSNP)
+```
+
+##Exercise 10: repeat all parts in question 8 with 2N=2,000
+
+a) Add mutations to the genealogies in question 6 (2N=20,000)
+```{r}
+#add mutations, 10,000 sims, 2N=2,000
+mu <- 1e-4
+NN <- 1000
+CoalesTime <- rexp(10000, 1/(2*NN))
+MutaRate <- 2*mu*CoalesTime
+mean(MutaRate)
+NumbSNP <- rpois(10000, mean(MutaRate))
+```
+
+b) What is the average number of SNPs per genealogy?
+```{r}
+mean(NumbSNP)
+```
+
+c) What is theta predicted to be in this example?
+```{r}
+#theta=4*N*mu
+theta <- 4*NN*mu
+theta
+```
+
+d) How does theta compare to the average number of SNPs in simulations?
+
+They are similar.
+
+e) Pretty neat, huh?
+```{r}
+print("Yes, pretty neat!")
+```
+
+f) Make density plot on the number of SNPs per simulation replicate
+```{r}
+#density plot
+hist(NumbSNP)
+```
+
+##Exercise 11: Make scatter plot of number of SNPs in each sim replicate vs TMRCA for that sim replicate. How are these variables related to each other? Does the number of SNPs tell you anything about the TMRCA?
+```{r}
+plot(CoalesTime, NumbSNP)
+```
+Higher number of SNPs occur in shorter TMRCA. 
+
+##Exercise 12: imagine you sequenced a 10kb region of DNA from a diploid individual. You observed 10 SNPs in that 10kb interval. Independent evidence suggests mutation rate=1e-8 per bp per gen.
+
+a) Use coalescent sims to evaluate whether a model with N=10,000 is compatible with your observed data. Or, what proportion of simulation replicates from this model have >= 10 SNPs?
+```{r}
+mu <- 1e-8
+NN <- 10000
+CoalesTime <- rexp(10000, 1/(2*NN))
+MutaRate <- 2*mu*CoalesTime
+mean(MutaRate)
+NumbSNP <- rpois(10000, mean(MutaRate))
+sum(NumbSNP >= 10)/10000
+```
+No, it is not compatible. None of the sim replicates have greater than or equal to 10 SNPs.
+
+b) Is the model with N=1,000 compatible with your observed data? What proportion of simulation replicates from this model have >= 10 SNPs?
+```{r}
+mu <- 1e-8
+NN <- 1000
+CoalesTime <- rexp(10000, 1/(2*NN))
+MutaRate <- 2*mu*CoalesTime
+mean(MutaRate)
+NumbSNP <- rpois(10000, mean(MutaRate))
+sum(NumbSNP >= 10)/10000
+```
+No, it is not compatible.
 

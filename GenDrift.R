@@ -112,3 +112,50 @@ popsize <- c(10, 100, 500, 1000)
 fixedproportion <- c(fix3, fix1, fix4, fix5)
 table <- rbind(popsize, fixedproportion)
 table
+
+
+################################################################################
+#Coalescence
+
+#Draw 10 values from an exp dist with rate 2
+rexp(10, 2)
+mean(rexp(10000, 2))
+
+#10,000 sims
+NN <- 10000
+CoalesTime <- rexp(10000, 1/(2*NN))
+mean(CoalesTime)
+
+#density plot
+hist(CoalesTime)
+
+sd(CoalesTime)
+
+
+#########################
+#poisson distribution
+rpois(10, 2)
+mean(rpois(10000, 2))
+
+#add mutations, 10,000 sims, 2N=20,000
+mu <- 1e-4
+NN <- 10000
+CoalesTime <- rexp(10000, 1/(2*NN))
+MutaRate <- 2*mu*CoalesTime
+mean(MutaRate)
+NumbSNP <- rpois(10000, mean(MutaRate))
+#for (ii in 1:10000){
+#  NumbSNP <- rpois(10000, MutaRate[ii])
+#}
+mean(NumbSNP)
+
+rm(list = ls())
+
+#theta=4*N*mu
+theta <- 4*NN*mu
+theta
+
+#density plot
+hist(NumbSNP)
+
+
