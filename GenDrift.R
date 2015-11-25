@@ -143,10 +143,10 @@ NN <- 10000
 CoalesTime <- rexp(10000, 1/(2*NN))
 MutaRate <- 2*mu*CoalesTime
 mean(MutaRate)
-NumbSNP <- rpois(10000, mean(MutaRate))
-#for (ii in 1:10000){
-#  NumbSNP <- rpois(10000, MutaRate[ii])
-#}
+NumbSNP <- rep(NA, NN)
+for (ii in 1:10000){
+  NumbSNP[ii] <- rpois(1, MutaRate[ii])
+}
 mean(NumbSNP)
 
 rm(list = ls())
