@@ -142,7 +142,12 @@ mu <- 1e-4
 NN <- 10000
 CoalesTime <- rexp(10000, 1/(2*NN))
 MutaRate <- 2*mu*CoalesTime
+<<<<<<< HEAD
 NumbSNP <- rep(NA, 10000)
+=======
+mean(MutaRate)
+NumbSNP <- rep(NA, NN)
+>>>>>>> origin/master
 for (ii in 1:10000){
   NumbSNP[ii] <- rpois(1, MutaRate[ii])
 }

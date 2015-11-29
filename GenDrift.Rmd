@@ -241,7 +241,7 @@ g) What can you conclude about how the population size affects the expected coal
 
 The expected coalescent time increases linearly with respect to the population size. 
 
-##EXercise 8: Add mutations to the genealogies simulated. Set mu=1e^-4
+##EXercise 8: Add mutations to the genealogies simulated. Set mu=1e-4
 
 a) Add mutations to the genealogies in question 6 (2N=20,000)
 ```{r}
@@ -251,7 +251,10 @@ NN <- 10000
 CoalesTime <- rexp(10000, 1/(2*NN))
 MutaRate <- 2*mu*CoalesTime
 mean(MutaRate)
-NumbSNP <- rpois(10000, mean(MutaRate))
+NumbSNP <- rep(NA, NN)
+for (ii in 1:10000){
+  NumbSNP[ii] <- rpois(1, MutaRate[ii])
+}
 ```
 
 b) What is the average number of SNPs per genealogy?
@@ -291,7 +294,10 @@ NN <- 1000
 CoalesTime <- rexp(10000, 1/(2*NN))
 MutaRate <- 2*mu*CoalesTime
 mean(MutaRate)
-NumbSNP <- rpois(10000, mean(MutaRate))
+NumbSNP <- rep(NA, NN)
+for (ii in 1:10000){
+  NumbSNP[ii] <- rpois(1, MutaRate[ii])
+}
 ```
 
 b) What is the average number of SNPs per genealogy?
@@ -325,7 +331,7 @@ hist(NumbSNP)
 ```{r}
 plot(CoalesTime, NumbSNP)
 ```
-Higher number of SNPs occur in shorter TMRCA. 
+Higher number of SNPs occur in longer TMRCA. 
 
 ##Exercise 12: imagine you sequenced a 10kb region of DNA from a diploid individual. You observed 10 SNPs in that 10kb interval. Independent evidence suggests mutation rate=1e-8 per bp per gen.
 
@@ -336,8 +342,15 @@ NN <- 10000
 CoalesTime <- rexp(10000, 1/(2*NN))
 MutaRate <- 2*mu*CoalesTime
 mean(MutaRate)
+<<<<<<< HEAD
 NumbSNP <- rpois(10000, mean(MutaRate))
 #Replicates with number of SNP greater than or equal to 10
+=======
+NumbSNP <- rep(NA, NN)
+for (ii in 1:10000){
+  NumbSNP[ii] <- rpois(1, MutaRate[ii])
+}
+>>>>>>> origin/master
 sum(NumbSNP >= 10)
 ```
 Yes, it is compatible.
@@ -349,8 +362,15 @@ NN <- 1000
 CoalesTime <- rexp(10000, 1/(2*NN))
 MutaRate <- 2*mu*CoalesTime
 mean(MutaRate)
+<<<<<<< HEAD
 NumbSNP <- rpois(10000, mean(MutaRate))
 #Replicates with number of SNP greater than or equal to 10
+=======
+NumbSNP <- rep(NA, NN)
+for (ii in 1:10000){
+  NumbSNP[ii] <- rpois(1, MutaRate[ii])
+}
+>>>>>>> origin/master
 sum(NumbSNP >= 10)
 ```
 No, it is not compatible.
