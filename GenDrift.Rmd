@@ -331,25 +331,27 @@ Higher number of SNPs occur in shorter TMRCA.
 
 a) Use coalescent sims to evaluate whether a model with N=10,000 is compatible with your observed data. Or, what proportion of simulation replicates from this model have >= 10 SNPs?
 ```{r}
-mu <- 1e-8
+mu <- 1e-8*10000
 NN <- 10000
 CoalesTime <- rexp(10000, 1/(2*NN))
 MutaRate <- 2*mu*CoalesTime
 mean(MutaRate)
 NumbSNP <- rpois(10000, mean(MutaRate))
-sum(NumbSNP >= 10)/10000
+#Replicates with number of SNP greater than or equal to 10
+sum(NumbSNP >= 10)
 ```
-No, it is not compatible. None of the sim replicates have greater than or equal to 10 SNPs.
+Yes, it is compatible.
 
 b) Is the model with N=1,000 compatible with your observed data? What proportion of simulation replicates from this model have >= 10 SNPs?
 ```{r}
-mu <- 1e-8
+mu <- 1e-8*10000
 NN <- 1000
 CoalesTime <- rexp(10000, 1/(2*NN))
 MutaRate <- 2*mu*CoalesTime
 mean(MutaRate)
 NumbSNP <- rpois(10000, mean(MutaRate))
-sum(NumbSNP >= 10)/10000
+#Replicates with number of SNP greater than or equal to 10
+sum(NumbSNP >= 10)
 ```
 No, it is not compatible.
 

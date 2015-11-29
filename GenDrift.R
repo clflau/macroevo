@@ -15,7 +15,7 @@ count
 count/(2*NN)
 
 
-#function
+#function to simulate genetic drift (without mutations)
 GenDriftFunc <- function(LL, NN, p0, TT){
   #matrix of allele freq of each SNP (col) in each gen (row)
   freqs <- matrix(nrow = TT, ncol = LL)
@@ -142,11 +142,10 @@ mu <- 1e-4
 NN <- 10000
 CoalesTime <- rexp(10000, 1/(2*NN))
 MutaRate <- 2*mu*CoalesTime
-mean(MutaRate)
-NumbSNP <- rpois(10000, mean(MutaRate))
-#for (ii in 1:10000){
-#  NumbSNP <- rpois(10000, MutaRate[ii])
-#}
+NumbSNP <- rep(NA, 10000)
+for (ii in 1:10000){
+  NumbSNP[ii] <- rpois(1, MutaRate[ii])
+}
 mean(NumbSNP)
 
 rm(list = ls())
