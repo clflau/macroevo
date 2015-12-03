@@ -226,7 +226,7 @@ abline(v=quantile(posteriorTT_split,0.95),lty=2,lwd=1,col=1)
 
 ##Exercise 9: Do your estimates of the median and credible interval of tsplit differ from above?
 
-The median is slightly lower than before. 
+The median is slightly lower than before. The peak of the posterior distribution is slightly shorter and less narrow, and the credible interval remains more or less the same.
 
 
 
